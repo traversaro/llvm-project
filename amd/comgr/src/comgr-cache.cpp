@@ -130,7 +130,9 @@ void saveCommandOutput(CachedCommandAdaptor &C, AddStreamFn &AddStream,
 
   CachedFileStream *CFS = FileOrErr->get();
   serializeCacheEntry(*CFS->OS, *Buffer, CapturedLogS);
-  ErrorHandler(CFS->commit(), "when commiting file stream");
+  // in clang 20, the commit is performed in the CFS destructor.
+  // ErrorHandler(CFS->commit(), "when commiting file stream");
+  static_assert(LLVM_VERSION_MAJOR == 20, "This patch is meant to be used with llvm 20");
 }
 
 bool readEntryFromCache(CachedCommandAdaptor &C, MemoryBuffer &CachedBuffer,
